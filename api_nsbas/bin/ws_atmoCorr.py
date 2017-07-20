@@ -23,6 +23,7 @@ import paramiko
 # Doit etre dans le PYTHON PATH
 import lib_ws.ws_nsbas as lws_nsbas
 import lib_ws.ws_connect as lws_connect
+import ws_tools
 
 # Incluons un fichier de parametres communs a tous les webservices
 import parametres
@@ -110,20 +111,14 @@ def get_status(job_id, process_token):
     :return: the status of the task
     :rtype: str (containing a json)
     """
-    ssh_client = None
+    ret = None
     try:
-        ssh_client = lws_connect.connect_with_sshconfig(config, ssh_config_file)
+        ret = ws_tools.get_status(job_id, process_token, config, ssh_config_file)
     except Exception as excpt:
-        logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-        raise excpt
-    if ssh_client is None:
-        logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-        raise ValueError("unable to log on %s, ABORTING", config["clstrHostName"])
-    logging.info("get_status for token %s", process_token)
-    status = lws_connect.get_job_status(ssh_client, job_id)
-    ssh_client.close()
-    status_json = lws_nsbas.getJobStatus(job_id, process_token, status)
-    return jsonify(status_json)
+        logging.critical("connection to cluster failed : %s", excpt)
+        ret = lws_nsbas.getJobStatus(job_id, process_token, 
+                                     "Connection to cluster failed: {}".format(excpt))
+    return ret 
 
 @app.route('/v' + wsVersion + '/services/'+wsName, methods = ['POST'])
 @auth.login_required
@@ -137,7 +132,7 @@ def execute():
     if request.values['mode'] == "async" :
         # TODO : estimer dynamiquement walltime
         process_token = request.json[0]['processToken']
-        subswath = request.json[0]['subSwath']
+        subswath = request.json[1]['subSwath']
         logging.critical("getting: token %s swath %s", str(process_token), str(subswath))
         token_dir = remote_data_prefix + '/' + process_token
         working_dir = token_dir + '/iw' + subswath
@@ -151,10 +146,14 @@ def execute():
             ssh_client = lws_connect.connect_with_sshconfig(config, ssh_config_file)
         except Exception as excpt:
             logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-            raise excpt
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                                "error while connecting to server")
+            return jsonify(statusJson), 500
         if ssh_client is None:
             logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-            raise ValueError("unable to log on %s, ABORTING", config["clstrHostName"])
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                                "error while connecting to server")
+            return jsonify(statusJson), 500
         logging.info("connection OK")
         command = " ".join('nsb_make_corr_atmo_erai.py', 'nsbas.proc'])
         try:
@@ -165,17 +164,18 @@ def execute():
         except Exception as excpt:
             error = error + "fail to run command on server: {}".format(excpt)
             logging.error(error)
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, error)
+            return jsonify(statusJson), 500
         ssh_client.close()
 
         # Des lors qu'il est lance, le webservice donne son jeton via son GetStatus,
         #sans attendre d'avoir terminé
-        status = get_status(job_id, process_token)
-        logging.critical("response=%s", status)
-        return status, 201
+        statusJson = lws_nsbas.getJobStatus(job_id, process_token, error)
+        return jsonify(statusJson), 201
     else :
         # En mode synchrone, le webservice donne illico sa réponse GetResult
         resultJson = lws_nsbas.getJobStatus('NaN', process_token, "No sync mode allowed")
-        return resultJson, 200
+        return resultJson, 500
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>/<process_token>/outputs', methods = ['GET'])
 #@auth.login_required

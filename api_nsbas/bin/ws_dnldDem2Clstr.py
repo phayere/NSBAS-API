@@ -24,6 +24,7 @@ import logging
 
 import lib_ws.ws_nsbas as lws_nsbas
 import lib_ws.ws_connect as lws_connect
+import ws_tools
 
 # Incluons un fichier de parametres communs a tous les webservices
 
@@ -42,17 +43,13 @@ ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 from flask_cors import CORS, cross_origin
 app = Flask(__name__, static_url_path = "")
 cors = CORS(app, resources={r"*": {"origins": "*"}})
+auth = HTTPBasicAuth()
 
 # Parametres specifiques a ce webservice
 wsName = 'ws_dnldDem2Clstr'
 wsVersion = config['apiVersion']
 wsPortNumber = int(config['ws_dnldDem2Clstr_PN'])
 
-# Incluons un fichier de parametres communs a tous les webservices
-#execfile("parametres.py")
-
-app = Flask(__name__, static_url_path = "")
-auth = HTTPBasicAuth()
 
 @auth.get_password
 def get_password(username):
@@ -101,8 +98,14 @@ def describe_process():
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>/<process_token>', methods = ['GET'])
 @auth.login_required
 def get_status(job_id, process_token):
-    statusJson = getJobStatus(job_id,process_token)
-    return jsonify(statusJson)
+    ret = None
+    try:
+        ret = ws_tools.get_status(job_id, process_token, config, ssh_config_file)
+    except Exception as excpt:
+        logging.critical("connection to cluster failed : %s", excpt)
+        ret = lws_nsbas.getJobStatus(job_id, process_token, 
+                                     "Connection to cluster failed: {}".format(excpt))
+    return ret 
 
 @app.route('/v' + wsVersion + '/services/'+wsName, methods = ['POST'])
 @auth.login_required
@@ -111,6 +114,7 @@ def execute():
      L'execute asynchrone doit renvoyer la reponse du GetStatus et la reponse http 201 ou celle du GetResult et la reponse http 200, selon
      L'execute du webservice ws_dnldDem2Clstr doit
     """
+    logging.critical("getting: %s", str(request.json))
     logging.critical("getting: %s", str(request.json[0]['processToken']))
     process_token = request.json[0]['processToken']
 
@@ -126,32 +130,36 @@ def execute():
             ssh_client = lws_connect.connect_with_sshconfig(config, ssh_config_file)
         except Exception as excpt:
             logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-            raise excpt
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                                "error while connecting to server")
+            return jsonify(statusJson), 500
         if ssh_client is None:
             logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-            raise ValueError("unable to log on %s, ABORTING", config["clstrHostName"])
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                                "error while connecting to server")
+            return jsonify(statusJson), 500
         logging.info("connection OK")
         dem_dir = token_dir + '/DEM'
         slc_dir = token_dir + '/SLC'
         command = " ".join(["mkdir", dem_dir + '; ',
-                            "nsb_getDemFile.py", "fromRadarImage",
-                            slc_dir, dem_dir])
+                            "nsb_getDemFile.py", "-v", "4", "--safe", slc_dir, "-t", dem_dir])
         try:
             logging.critical("launching command: %s", command)
             job_id = lws_connect.run_on_cluster_node(ssh_client, command, str(process_token),
                                                   process_ressources)
             logging.critical("returned from submission %s", job_id)
         except Exception as excpt:
-            error = error + "fail to run command on server: {}".format(excpt)
-            logging.error(error)
+            logging.error(str(excpt))
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, str(excpt))
+            return jsonify(statusJson), 500
         ssh_client.close()
         # Des lors qu'il est lance, le webservice donne son jeton via son GetStatus, sans attendre d'avoir terminé
-        resultJson = {"job_id" : job_id , "processToken": process_token}
-        return jsonify(resultJson), 201
+        statusJson = lws_nsbas.getJobStatus(job_id, process_token, "Accepted")
+        return jsonify(statusJson), 201
     else :
         # En mode synchrone, le webservice donne illico sa réponse GetResult
-        resultJson = {"job_id" : job_id , "processToken": process_token}
-        return jsonify(resultJson), 200
+        resultJson = lws_nsbas.getJobStatus('NaN', process_token, "No sync mode allowed")
+        return resultJson, 500
 
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>/<process_token>/outputs', methods = ['GET'])
@@ -161,14 +169,15 @@ def get_result(job_id,process_token):
     # le webservice a besoin du job Id et, par sécurité,
     # du jeton de suivi du processus de calcul pour répondre
     # On les trouve dans les paramètres de l'url
-    resultJson = { "job_id" : job_id , "processToken": process_token }
-    return jsonify(resultJson), 200
+    statusJson = lws_nsbas.getJobStatus(job_id, process_token, "")
+    return jsonify(statusJson), 200
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>', methods = ['DELETE'])
 @auth.login_required
 def dismiss(job_id):
 # Directive prevue mais non mise en place. Informons l'interlocuteur par le code 501 : NOT IMPLEMENTED
-    return jsonify( { 'job_id' : job_id , 'result': False } ), 501
+    statusJson = lws_nsbas.getJobStatus(job_id, "", "result: false")
+    return jsonify(statusJson), 501
 
 
 if __name__ == '__main__':

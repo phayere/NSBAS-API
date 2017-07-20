@@ -66,7 +66,7 @@ def get_password(username):
 def unauthorized():
     return make_response(jsonify( { 'error': 'Unauthorized access' } ), 403)
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
-    
+
 @app.errorhandler(400)
 def not_found(error):
     return make_response(jsonify( { 'error': 'Bad request' } ), 400)
@@ -84,13 +84,13 @@ def get_capabilities():
 @auth.login_required
 def describe_process():
     return jsonify( {
-		  "id": ""+wsName+"",
-		  "label": "ForM@Ter/Etalab ws_dnldResult webservice",
-		  "description": "Provides the file it is asked for, designated by its unique identifier.",
-		  "inputs":  [ "http://<hostname>/v1.0/services/ws_dnldResult/<processToken>/outputs/<resName>" ], 
-                  "outputs": [ "<Downloaded file>"] 
-                    }
-		  )
+      "id": ""+wsName+"",
+      "label": "ForM@Ter/Etalab ws_dnldResult webservice",
+      "description": "Provides the file it is asked for, designated by its unique identifier.",
+      "inputs":  [ "http://<hostname>/v1.0/services/ws_dnldResult/<processToken>/outputs/<resName>" ], 
+                      "outputs": [ "<Downloaded file>"] 
+                        }
+  )
 
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<process_token>/outputs/<int:res_name>', methods = ['GET'])

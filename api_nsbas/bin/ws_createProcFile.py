@@ -42,14 +42,13 @@ ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 from flask_cors import CORS, cross_origin
 app = Flask(__name__, static_url_path = "")
 cors = CORS(app, resources={r"*": {"origins": "*"}})
+auth = HTTPBasicAuth()
 
 # Parametres specifiques a ce webservice
 wsName = 'ws_createProcFile'
 wsVersion = config['apiVersion']
 wsPortNumber = int(config['ws_createProcFile_PN'])
 
-app = Flask(__name__, static_url_path = "")
-auth = HTTPBasicAuth()
 
 @auth.get_password
 def get_password(username):
@@ -97,13 +96,12 @@ def describe_process():
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>/<process_token>', methods = ['GET'])
 @auth.login_required
 def get_status(job_id,process_token):
-    statusJson = lws_nsbas.getJobStatus(job_id,process_token)
+    statusJson = lws_nsbas.getJobStatus(job_id, process_token, 'NA: sync mode')
     return jsonify(statusJson)
 
 @app.route('/v' + wsVersion + '/services/'+wsName, methods = ['POST'])
 @auth.login_required
 def execute():
-
     logging.critical("getting: token %s", str(request.json[0]['processToken']))
     logging.critical("getting: swath %s", str(request.json[1]['subSwath']))
     process_token = request.json[0]['processToken']
@@ -113,11 +111,15 @@ def execute():
     try:
         ssh_client = lws_connect.connect_with_sshconfig(config, ssh_config_file)
     except Exception as excpt:
-        logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-        raise excpt
+            logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
+            statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                                "error while connecting to server")
+            return jsonify(statusJson), 500
     if ssh_client is None:
         logging.critical("unable to log on %s, ABORTING", config["clstrHostName"])
-        raise ValueError("unable to log on %s, ABORTING", config["clstrHostName"])
+        statusJson = lws_nsbas.getJobStatus("NaN", process_token, 
+                                            "error while connecting to server")
+        return jsonify(statusJson), 500
     logging.info("connection OK")
     # command is not expensive -> we can run it on frontal
     dem_dir = token_dir + '/DEM'
@@ -133,8 +135,8 @@ def execute():
         ssh_client.close()
         return jsonify(resultJson), 500
     ssh_client.close()
-    resultJson = { "job_id" : "NaN", "processToken": process_token }
-    return jsonify(resultJson), 200
+    statusJson = lws_nsbas.getJobStatus("NaN", process_token, "")
+    return jsonify(statusJson), 200
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>/<process_token>/outputs', methods = ['GET'])
 #@auth.login_required
@@ -143,14 +145,14 @@ def get_result(job_id,process_token):
     # le webservice a besoin du job Id et, par sécurité,
     # du jeton de suivi du processus de calcul pour répondre
     # On les trouve dans les paramètres de l'url
-    resultJson = { "job_id" : job_id , "processToken": process_token }
-    return jsonify(resultJson), 200
+    statusJson = lws_nsbas.getJobStatus(job_id, process_token, "")
 
 @app.route('/v' + wsVersion + '/services/'+wsName+'/<int:job_id>', methods = ['DELETE'])
 @auth.login_required
 def dismiss(job_id):
 # Directive prevue mais non mise en place. Informons l'interlocuteur par le code 501 : NOT IMPLEMENTED
-    return jsonify( { 'job_id' : job_id , 'result': False } ), 501
+    statusJson = lws_nsbas.getJobStatus(job_id, "", "result: false")
+    return jsonify(statusJson), 501
 
 
 if __name__ == '__main__':
