@@ -111,8 +111,13 @@ def get_job_status(ssh_client, oar_id):
     """
     command = "python ws_cluster/bin/wsc_get_status.py --oarid {}".format(oar_id)
     logging.critical("info for status: command=%s", command)
-    ret = run_on_frontal(ssh_client, command)
-    logging.critical("status: %s", ret)
+    ret = None
+    try:
+        ret = run_on_frontal(ssh_client, command)
+        logging.info("status: %s", ret)
+    except Exception as excpt:
+        ret = "error {}".format(excpt)
+        logging.critical("status: %s", ret)
     return ret
 
 def test_connect_luke(cluster):
