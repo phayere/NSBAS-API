@@ -41,6 +41,7 @@ ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 from flask_cors import CORS, cross_origin
 app = Flask(__name__, static_url_path = "")
 cors = CORS(app, resources={r"*": {"origins": "null", "supports_credentials": True}})
+auth = HTTPBasicAuth()
 logging.getLogger('flask_cors').lev = logging.DEBUG
 
 # Parametres specifiques a ce webservice
@@ -48,8 +49,6 @@ wsName = 'ws_atmoCorr'
 wsVersion = config['apiVersion']
 wsPortNumber = int(config[wsName + '_PN'])
 
-#app = Flask(__name__, static_url_path = "")
-auth = HTTPBasicAuth()
 
 @auth.get_password
 def get_password(username):
@@ -155,7 +154,7 @@ def execute():
                                                 "error while connecting to server")
             return jsonify(statusJson), 500
         logging.info("connection OK")
-        command = " ".join('nsb_make_corr_atmo_erai.py', 'nsbas.proc'])
+        command = " ".join(['nsb_make_corr_atmo_erai.py', 'nsbas.proc'])
         try:
             logging.critical("launching command: %s", command)
             job_id = lws_connect.run_on_cluster_node(ssh_client, command, str(process_token),
