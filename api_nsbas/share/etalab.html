@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etalab API test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Etalab API TEST</h1>
+      <div class="row">
+		 <div class="col-sm-6"> Images: <input type="text" id="imgListInput" class="form-control" placeholder="imglist"></div>
+	  </div>
+      <div class="row">
+		 <div class="col-sm-6"> Token: <input type="text" id="token" class="form-control" placeholder="token"></div>
+      </div>
+	  <br />
+
+      <div class="row">
+		<div class="col-sm-3"> WS0: Download Sar Image  </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_btn" class="btn btn-primary btn-block" value="Run"> </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_getstatus_btn" class="btn btn-primary btn-block" value="getstatus"  disabled> </div>
+      </div>
+	  <br />
+      <div class="row">
+		<div class="col-sm-3"> WS1: Download DEM</div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+      </div>
+		<br />
+	<h2></h2>
+      <div class="row">
+		<div class="col-sm-3"> WS2: Make proc dir</div>
+        <div class="col-sm-2"> <input type="button" id="ws_createProcFile_btn" class="btn btn-primary btn-block" value="Run" > </div>
+		<div class="col-sm-1"> Swath </div> 
+		<div class="col-sm-1"> <input type="text" id="swathInput" class="form-control" placeholder="swath"></div>
+      </div>
+		<br />
+      <div class="row">
+		<div class="col-sm-3"> WS3: coregListInterf</div>
+        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  >
+        </div>
+      </div>
+		<br />
+      <div class="row">
+		<div class="col-sm-3">WS4: compInterf</div>
+        <div class="col-sm-2"> <input type="button" id="ws_compInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_compInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  >
+        </div>
+      </div>
+		<br />
+      <div class="row">
+		<div class="col-sm-3">WS5: correction Atmo</div>
+        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+      </div>
+		<br />
+      <div class="row">
+		<div class="col-sm-3">WS6: filter unwrap</div>
+        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+      </div>
+		<br />
+      <div class="row">
+		<div class="col-sm-3">WS7: geocode Interf</div>
+        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+      </div>
+		<br />
+
+      <div class="row">
+		<div class="col-sm-3">WS8: dnld result</div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldResult_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dlndResult_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+      </div>
+		<br />
+	  <div class="row">Info</div> <br /> 
+	  <div class="row">
+          <div class="col-sm-10"><pre id="info"></pre> </div>
+	  </div>
+	</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript">
+    $("#imgListInput").html("e7a00278-d4d4-5944-b854-6005cce06e50;1d995b08-44f7-5f91-9963-6ef724a610c3");
+    $("#swathInput").val("1")
+	function get_status(oarid, processtoken, service, btn, portnum){
+			console.log("in get_status function", oarid, processtoken, service)
+			$('#info').html("waiting ...");
+		  // get the status of the job id, and token and put info in zone
+		  // change status of btn to disable=false
+		  var query_str = 'http://ist-etalab:' + portnum + '/v1.0/services/' + service + '/' + oarid + '/' + processtoken;
+		  console.log("get_status: query", query_str)
+		  $.ajax(query_str, {
+				method: 'GET',
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader ("Authorization", "Basic " + btoa("miguel" + ":" + "python"));
+				},
+			}).done(function(result, status, $xhr){
+					$('#info').html(JSON.stringify(result, null, 2));
+			}).fail(function($xhr, status, msg) {
+				  console.log(msg, $xhr, status);
+				  $('#info').html(msg);
+			});
+    }
+
+	function run_post_query(service, portnum, data, sync_mode){
+		  btn = $('#' + service + '_btn')
+		  console.log("run_post_query", btn, service, portnum, data, sync_mode)
+		  str_query = 'http://ist-etalab:' + portnum + '/v1.0/services/' + service + '?mode=' + sync_mode;
+		  console.log("run_post. query:", str_query)
+		  console.log("run_post. data:", data)
+		  $.ajax(str_query, {
+            accepts: 'application/json',
+            contentType: 'application/json',
+		    data: JSON.stringify(data),
+            method: 'POST',
+		    beforeSend: function (xhr) {
+		      xhr.setRequestHeader ("Authorization", "Basic " + btoa("miguel" + ":" + "python"));
+		    },
+          })
+        .done(function(result, status, $xhr) {
+          $('#info').html(JSON.stringify(result, null, 2));
+		  if (sync_mode == "async"){
+			var str_service_btn = '#' + service + '_btn'
+			var str_service_getstatus_btn = '#' + service + '_getstatus_btn'
+			console.log(str_service_btn);
+			console.log(str_service_getstatus_btn);
+			var oarid = result.StatusInfo.JobID;
+			var processtoken = result.StatusInfo.processToken;
+			console.log("run_post_query: on done: ", oarid, processtoken, service)
+			$('#token').val(processtoken);
+			$(str_service_btn).attr('disabled', true)
+			$(str_service_getstatus_btn).attr('disabled', false)
+			$(str_service_getstatus_btn).on('click', function () {
+					   get_status(oarid, processtoken, service, btn, portnum);
+		    });
+		  }
+        })
+        .fail(function($xhr, status, msg) {
+		  console.log(msg, $xhr, status);
+          $('#info').html(msg);
+        })
+        .always(function() {
+          btn.attr('disabled', false);
+        });
+
+        $('#info').html('Waiting ...');
+        btn.attr('disabled', true);
+	
+	}
+
+    function run_post_query_token(service, port, sync_mode){
+	  btn = $('#' + service + '_btn') 
+      var tokenValue = $('#token').val();
+	  var swath = $('#swathInput').val()
+	  oarid_token = []
+	  oarid_token.push({"processToken": tokenValue})
+	  oarid_token.push({"subSwath" : swath})
+	  console.log("run_post_query:", service, port, sync_mode, oarid_token)
+	  run_post_query(service, port, oarid_token, sync_mode);
+    }
+
+
+    $(document).ready(function () {
+      $('#ws_dnldSar2Clstr_btn').on('click', function () {
+        var imgListStr = $('#imgListInput').val();
+	    var imgList = imgListStr.split(";");
+	    var arr_data = [];
+	    for (var i=0; i< imgList.length; i++){
+  	    	arr_data.push({"id": imgList[i]});
+     	  } 
+	    var data_arr = [{"pepsDataIds" : arr_data}];
+	    run_post_query("ws_dnldSar2Clstr", "1111", data_arr, 'async')
+       });
+
+      $('#ws_dnldDem2Clstr_btn').on('click', function () {
+	    // will pass both token an swath, but only token used
+		run_post_query_token("ws_dlndDem2Clstr", "2222", 'async');
+      });
+
+      $('#ws_createProcFile_btn').on('click', function () {
+		run_post_query_token("ws_createProcFile", "3333", 'sync');
+      });
+
+	  $('#ws_coregListInterf_btn').on('click', function () {
+		run_post_query_token('coregListInterf', '4444', 'async');
+	  });
+
+      $('#ws_compInterf_btn').on('click', function () {
+		run_post_query_token('ws_compInterf', '5555', 'async');
+      });
+
+      $('#ws_atmoCorr_btn').on('click', function () {
+		console.log("doing atmospheric corrections")
+       	run_post_query_token("ws_atmoCorr", "5556", 'async');
+      });
+      $('#ws_filtrunwrInterf_btn').on('click', function () {
+		run_post__token("ws_filtrunwrInterf", "7777", 'async');
+      });
+      $('#ws_geocodeInterf_btn').on('click', function () {
+		run_post__token("ws_geocodeInterf", "8888", 'async');
+      });
+
+      $('#ws_dnldResult_btn').on('click', function () {
+		run_post__token("ws_dnldResult", "8888", 'async');
+      });
+
+    });
+    </script>
+  </body>
+</html>
