@@ -136,7 +136,7 @@ def execute():
         token_dir = remote_data_prefix + '/' + process_token
         working_dir = token_dir + '/iw' + subswath
         log_dir = token_dir + '/LOG'
-        process_ressources = {"nodes" : 1, "cores" : 4, "walltime" : "00:30:00",
+        process_ressources = {"nodes" : 1, "cores" : 8, "walltime" : "05:00:00",
                 "workdir": working_dir, "logdir" : log_dir}
         ret = "Error"
         error = "OK"
