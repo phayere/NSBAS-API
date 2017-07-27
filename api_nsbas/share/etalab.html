@@ -11,6 +11,15 @@
   <body>
     <div class="container">
       <h1>Etalab API TEST</h1>
+	  <div class="row">
+		 <div class="col-sm-6"> Sites: 
+		 <div class="btn-group" role="group" aria-label="...">
+		  <button type="button" id="bostwana_btn" cbclass="btn btn-default">Bostwana</button>
+		  <button type="button" id="colima_btn" cbclass="btn btn-default">Colima</button>
+		  <button type="button" id="tibet_btn" cbclass="btn btn-default">Tibet</button>
+		</div>
+        </div>
+	 </div>
       <div class="row">
 		 <div class="col-sm-6"> Images: <input type="text" id="imgListInput" class="form-control" placeholder="imglist"></div>
 	  </div>
@@ -21,61 +30,61 @@
 
       <div class="row">
 		<div class="col-sm-3"> WS0: Download Sar Image  </div>
-        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_btn" class="btn btn-primary btn-block" value="Run"> </div>
-        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_getstatus_btn" class="btn btn-primary btn-block" value="getstatus"  disabled> </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_btn" class="btn btn-info btn-block" value="Run"> </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldSar2Clstr_getstatus_btn" class="btn btn-info btn-block" value="getstatus"> </div>
       </div>
 	  <br />
       <div class="row">
 		<div class="col-sm-3"> WS1: Download DEM</div>
-        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldDem2Clstr_getstatus_btn" class="btn btn-info btn-block" value="Get status"  > </div>
       </div>
 		<br />
 	<h2></h2>
       <div class="row">
 		<div class="col-sm-3"> WS2: Make proc dir</div>
-        <div class="col-sm-2"> <input type="button" id="ws_createProcFile_btn" class="btn btn-primary btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_createProcFile_btn" class="btn btn-info btn-block" value="Run" > </div>
 		<div class="col-sm-1"> Swath </div> 
 		<div class="col-sm-1"> <input type="text" id="swathInput" class="form-control" placeholder="swath"></div>
       </div>
 		<br />
       <div class="row">
 		<div class="col-sm-3"> WS3: coregListInterf</div>
-        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  >
+        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_coregListInterf_getstatus_btn" class="btn btn-info btn-block" value="Get status"  >
         </div>
       </div>
 		<br />
       <div class="row">
 		<div class="col-sm-3">WS4: compInterf</div>
-        <div class="col-sm-2"> <input type="button" id="ws_compInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_compInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  >
+        <div class="col-sm-2"> <input type="button" id="ws_compInterf_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_compInterf_getstatus_btn" class="btn btn-info btn-block" value="Get status"  >
         </div>
       </div>
 		<br />
       <div class="row">
 		<div class="col-sm-3">WS5: correction Atmo</div>
-        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_atmoCorr_getstatus_btn" class="btn btn-info btn-block" value="Get status"  > </div>
       </div>
 		<br />
       <div class="row">
 		<div class="col-sm-3">WS6: filter unwrap</div>
-        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_filtrunwrInterf_getstatus_btn" class="btn btn-info btn-block" value="Get status"  > </div>
       </div>
 		<br />
       <div class="row">
 		<div class="col-sm-3">WS7: geocode Interf</div>
-        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_geocodeInterf_getstatus_btn" class="btn btn-info btn-block" value="Get status"  > </div>
       </div>
 		<br />
 
       <div class="row">
 		<div class="col-sm-3">WS8: dnld result</div>
-        <div class="col-sm-2"> <input type="button" id="ws_dnldResult_btn" class="btn btn-primary btn-block" value="Run" > </div>
-        <div class="col-sm-2"> <input type="button" id="ws_dlndResult_getstatus_btn" class="btn btn-primary btn-block" value="Get status"  > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dnldResult_btn" class="btn btn-info btn-block" value="Run" > </div>
+        <div class="col-sm-2"> <input type="button" id="ws_dlndResult_getstatus_btn" class="btn btn-info btn-block" value="Get status"  > </div>
       </div>
 		<br />
 	  <div class="row">Info</div> <br /> 
@@ -86,7 +95,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script type="text/javascript">
-    $("#imgListInput").html("e7a00278-d4d4-5944-b854-6005cce06e50;1d995b08-44f7-5f91-9963-6ef724a610c3");
     $("#swathInput").val("1")
 	function get_status(oarid, processtoken, service, btn, portnum){
 			console.log("in get_status function", oarid, processtoken, service)
@@ -102,6 +110,8 @@
 				},
 			}).done(function(result, status, $xhr){
 					$('#info').html(JSON.stringify(result, null, 2));
+					console.log("result status=" + result.StatusInfo.Status);
+                    $('#' + service + '_btn').attr('value', result.StatusInfo.Status);
 			}).fail(function($xhr, status, msg) {
 				  console.log(msg, $xhr, status);
 				  $('#info').html(msg);
@@ -134,10 +144,11 @@
 			var processtoken = result.StatusInfo.processToken;
 			console.log("run_post_query: on done: ", oarid, processtoken, service)
 			$('#token').val(processtoken);
-			$(str_service_btn).attr('disabled', true)
-			$(str_service_getstatus_btn).attr('disabled', false)
+			$(str_service_btn).attr('value', result.StatusInfo.Status);
+			$(str_service_btn).attr('disabled', true);
+			$(str_service_getstatus_btn).attr('disabled', false);
 			$(str_service_getstatus_btn).on('click', function () {
-					   get_status(oarid, processtoken, service, btn, portnum);
+			   get_status(oarid, processtoken, service, btn, portnum);
 		    });
 		  }
         })
@@ -155,18 +166,33 @@
 	}
 
     function run_post_query_token(service, port, sync_mode){
-	  btn = $('#' + service + '_btn') 
-      var tokenValue = $('#token').val();
-	  var swath = $('#swathInput').val()
-	  oarid_token = []
-	  oarid_token.push({"processToken": tokenValue})
-	  oarid_token.push({"subSwath" : swath})
-	  console.log("run_post_query:", service, port, sync_mode, oarid_token)
-	  run_post_query(service, port, oarid_token, sync_mode);
+    btn = $('#' + service + '_btn');
+	  btn.on('click', function () {
+	    var tokenValue = $('#token').val();
+	    var swath = $('#swathInput').val()
+	    oarid_token = []
+	    oarid_token.push({"processToken": tokenValue})
+	    oarid_token.push({"subSwath" : swath})
+	    console.log("run_post_query:", service, port, sync_mode, oarid_token)
+	    run_post_query(service, port, oarid_token, sync_mode);
+	  });
     }
 
 
     $(document).ready(function () {
+	  $('#bostwana_btn').on('click', function(){
+		console.log("bostwana btn clicked");
+		$("#imgListInput").val("c80a6fa3-892a-5c7a-b417-d30ea447cc75;6dccf033-568e-5c7c-9f87-5a8fae3c7ab8");
+	  }); 
+	  $('#colima_btn').on('click', function(){
+		console.log("colima btn clicked");
+		$("#imgListInput").val("e7a00278-d4d4-5944-b854-6005cce06e50;1d995b08-44f7-5f91-9963-6ef724a610c3");
+	  }); 
+	  $('#tibet_btn').on('click', function(){
+		console.log("tibet btn clicked");
+		$("#imgListInput").val("4a3b7a58-ab6d-5e8b-ba60-9ae46209442a;c903b341-7e08-5a6c-bc57-60d1c971386b");
+	  }); 
+
       $('#ws_dnldSar2Clstr_btn').on('click', function () {
         var imgListStr = $('#imgListInput').val();
 	    var imgList = imgListStr.split(";");
@@ -177,38 +203,14 @@
 	    var data_arr = [{"pepsDataIds" : arr_data}];
 	    run_post_query("ws_dnldSar2Clstr", "1111", data_arr, 'async')
        });
-
-      $('#ws_dnldDem2Clstr_btn').on('click', function () {
-	    // will pass both token an swath, but only token used
-		run_post_query_token("ws_dlndDem2Clstr", "2222", 'async');
-      });
-
-      $('#ws_createProcFile_btn').on('click', function () {
+		run_post_query_token("ws_dnldDem2Clstr", "2222", 'async');
 		run_post_query_token("ws_createProcFile", "3333", 'sync');
-      });
-
-	  $('#ws_coregListInterf_btn').on('click', function () {
-		run_post_query_token('coregListInterf', '4444', 'async');
-	  });
-
-      $('#ws_compInterf_btn').on('click', function () {
+		run_post_query_token('ws_coregListInterf', '4444', 'async');
 		run_post_query_token('ws_compInterf', '5555', 'async');
-      });
-
-      $('#ws_atmoCorr_btn').on('click', function () {
-		console.log("doing atmospheric corrections")
        	run_post_query_token("ws_atmoCorr", "5556", 'async');
-      });
-      $('#ws_filtrunwrInterf_btn').on('click', function () {
-		run_post__token("ws_filtrunwrInterf", "7777", 'async');
-      });
-      $('#ws_geocodeInterf_btn').on('click', function () {
-		run_post__token("ws_geocodeInterf", "8888", 'async');
-      });
-
-      $('#ws_dnldResult_btn').on('click', function () {
-		run_post__token("ws_dnldResult", "8888", 'async');
-      });
+		run_post_query_token("ws_filtrunwrInterf", "7777", 'async');
+		run_post_query_token("ws_geocodeInterf", "8888", 'async');
+		run_post_query_token("ws_dnldResult", "8888", 'async');
 
     });
     </script>
