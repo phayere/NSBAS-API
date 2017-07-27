@@ -157,8 +157,9 @@ def execute():
                                                 "error while connecting to server")
             return jsonify(statusJson), 500
 #        logging.info("connection OK")
-        command = " ".join([ 'nsb_getUnwSeedPoint.py',  'nsbas.proc', ';', 
-                             'nsb_filtmaskunw_par.pl', 'nsbas.proc', 'init', 'unwrapped', '4'])
+        command = " ".join([ 'nsb_getUnwSeedPoint.py',  'nsbas.proc', ';'])
+        #, 
+        #                     'nsb_filtmaskunw_par.pl', 'nsbas.proc', 'init', 'unwrapped', '4'])
         try:
             logging.critical("launching command: %s", command)
             job_id = lws_connect.run_on_cluster_node(ssh_client, command, str(process_token),
