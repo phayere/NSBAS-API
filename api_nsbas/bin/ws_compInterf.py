@@ -150,8 +150,7 @@ def execute():
                                                 "error while connecting to server")
             return jsonify(statusJson), 500
         logging.info("connection OK")
-        command = " ".join([config['mpiCmd'], '-n', str(process_ressources["cores"]),
-                            'nsb_gen_phase_mpi.pl', 'nsbas.proc'])
+        command = " ".join([config['mpiCmd'], 'nsb_gen_phase_mpi.pl', 'nsbas.proc'])
         try:
             logging.critical("launching command: %s", command)
             job_id = lws_connect.run_on_cluster_node(ssh_client, command, str(process_token),
