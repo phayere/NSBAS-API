@@ -43,7 +43,8 @@ ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 # A restreindre dès que l'hébergement du frontal sera connu
 from flask_cors import CORS, cross_origin
 app = Flask(__name__, static_url_path = "")
-cors = CORS(app, resources={r"*": {"origins": "null", "supports_credentials": True}})
+cors = CORS(app, resources={r"*": {"origins": "*", "supports_credentials": True}})
+#cors = CORS(app, resources={r"*": {"origins": "null", "supports_credentials": True}})
 auth = HTTPBasicAuth()
 logging.getLogger('flask_cors').lev = logging.DEBUG
 
@@ -119,11 +120,12 @@ def get_status(job_id, process_token):
         logging.critical("connection to cluster failed : %s", excpt)
         ret = lws_nsbas.getJobStatus(job_id, process_token, 
                                      "Connection to cluster failed: {}".format(excpt))
-    return ret 
+    return ret
+
 
 @app.route('/v' + wsVersion + '/services/'+wsName, methods = ['POST'])
 @auth.login_required
-@cross_origin({"origins": "null", "supports_credentials": True})
+@cross_origin({"origins": "*", "supports_credentials": True})
 def execute():
     """ L'execute synchrone renvoit le resultat et la reponse http 200 : OK
      L'execute asynchrone doit renvoyer la reponse du GetStatus et la reponse http 201 ou celle du GetResult et la reponse http 200, selon
@@ -156,7 +158,8 @@ def execute():
                                                 "error while connecting to server")
             return jsonify(statusJson), 500
         logging.info("connection OK")
-        command = " ".join(['nsb_make_geomaptans.py', 'nsbas.proc', '4'])
+        command = " ".join(['nsb_make_geomaptrans.py', 'nsbas.proc', '4', ';',
+                            "nsb_geocode_save.py", "-v", "4", "-o", "irods://"+process_token, "nsbas.proc" ])
         try:
             logging.critical("launching command: %s", command)
             job_id = lws_connect.run_on_cluster_node(ssh_client, command, str(process_token),
